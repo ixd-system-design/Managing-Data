@@ -18,8 +18,12 @@ const prisma = new PrismaClient()
 // This is the 'C' of CRUD
 router.post('/data', async (req, res) => {
     try {
+        // Remove the id field from request body if it exists
+        // MongoDB will auto-generate an ID for new records
+        const { id, ...createData } = req.body
+
         const created = await prisma[model].create({
-            data: req.body
+            data: createData
         })
         res.status(201).send(created)
     } catch (err) {
@@ -71,6 +75,44 @@ router.get('/search', async (req, res) => {
 })
 
 
+// ----- UPDATE (PUT) -----
+// Listen for PUT requests
+// respond by updating a particular record in the database
+// This is the 'U' of CRUD
+// After updating the database we send the updated record back to the frontend.
+router.put('/data/:id', async (req, res) => {
+    try {
+        // Remove the id from the request body if it exists
+        // The id should not be in the data payload for updates
+        const { id, ...updateData } = req.body
+
+        // Prisma update returns the updated version by default
+        const updated = await prisma[model].update({
+            where: { id: req.params.id },
+            data: updateData
+        })
+        res.send(updated)
+    } catch (err) {
+        console.error('PUT /data/:id error:', err)
+        res.status(500).send({ error: 'Failed to update record', details: err.message || err })
+    }
+})
+
+// ----- DELETE -----
+// Listen for DELETE requests
+// respond by deleting a particular record in the database
+// This is the 'D' of CRUD
+router.delete('/data/:id', async (req, res) => {
+    try {
+        const result = await prisma[model].delete({
+            where: { id: req.params.id }
+        })
+        res.send(result)
+    } catch (err) {
+        console.error('DELETE /data/:id error:', err)
+        res.status(500).send({ error: 'Failed to delete record', details: err.message || err })
+    }
+})
 
 
 // export the api routes for use elsewhere in our app 

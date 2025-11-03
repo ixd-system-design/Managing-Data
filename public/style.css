@@ -69,7 +69,7 @@ header ul {
     margin: 1rem;
 }
 
-header .intro {
+#intro {
     max-width: 60rem;
     margin: auto;
     text-align: left;
@@ -92,16 +92,15 @@ button.save:hover {
     background-color: rgb(3, 103, 3);
 }
 
-button.reset {
+button.cancel {
     background: rgb(134, 134, 134);
 }
 
-button.reset:hover {
+button.cancel:hover {
     background: rgb(101, 101, 101);
 }
 
 
-main,
 #content {
     margin: 0 10vw;
     max-width: 60rem;
@@ -112,6 +111,38 @@ main,
     filter: drop-shadow(0 0 1rem #ccc);
     display: flex;
     flex-direction: column;
+}
+
+/* Popover styling */
+#formPopover {
+    max-width: 60rem;
+    padding: 2rem;
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0 2rem rgba(0, 0, 0, 0.3);
+    margin: auto;
+
+}
+
+#formPopover::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Create button */
+#createButton {
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    background: rgb(3, 136, 3);
+    border: none;
+    border-radius: 1rem;
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+#createButton:hover {
+    background: rgb(3, 103, 3);
 }
 
 #status p {
@@ -223,4 +254,193 @@ input:user-invalid+.validation,
 select:user-invalid+.validation,
 textarea:user-invalid+.validation {
     display: block;
+}
+
+/*  card styles */
+.item-card {
+    border: 1px solid #ddd;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    background: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    gap: 1rem;
+    text-align: left;
+}
+
+.item-card h3 {
+    font-size: 2rem;
+    margin: 0 0 1rem 0;
+    color: #333; 
+}
+
+.item-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.microchip-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    color: #666;
+    margin: 0.75rem 0 0 2rem;
+}
+.item-info {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item-info p {
+    margin: 0.5rem 0;
+}
+
+section.adoption,
+section.food{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+section.food img,
+section.adoption img{
+    width: 1.5rem;
+}
+ 
+
+
+/* styling for the calendar widget*/
+.calendar {
+    display: flex;
+    flex-direction: column;
+    width: 4rem;
+    text-align: center;
+    margin: 1rem 0 1rem 1rem;
+    background: #3b3b3b66; 
+    color: #fff; 
+    border-radius: 1rem;
+}
+
+.calendar .born {
+    margin: 0;
+    padding-top: 0.5rem;
+    border-radius: 1rem 1rem 0 0;
+}
+
+.calendar .born img {
+    width: 1.5rem;
+}
+
+.calendar .year {
+    border-top: 1px solid white;
+    font-weight: 700;
+    padding-bottom: 0.5rem;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.calendar .month {
+    border-top: 1px solid white;
+    text-transform: uppercase;
+    background: #3b3b3b66;
+    font-weight: 700;
+}
+
+.calendar .day {
+    border-top: 1px solid white;
+    background: #3b3b3bbb;
+    font-size: 2rem;
+    font-weight: 700;
+}
+ 
+/* Set accent colour for meter. */
+
+/* Style the background bar of the meter */
+meter::-webkit-meter-bar {
+    background: #fff;
+    /* background color of the meter */
+}
+
+/* Style for the 'optimum' range (e.g., the highest value range) */
+meter::-webkit-meter-optimum-value {
+    background: #000;
+}
+
+/* Style for the 'sub-optimum' range (e.g., medium value range) */
+meter::-webkit-meter-suboptimum-value {
+    background: #000;
+}
+
+/* Style for the 'even-less-good' range (e.g., low value range) */
+meter::-webkit-meter-even-less-good-value {
+    background: #000;
+}
+ 
+ 
+
+.stats .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; 
+    font-weight: 300;
+    padding: 0 3rem 0 1rem;
+
+}
+
+.stat span {
+    width: 5rem;
+    text-align: right;
+}
+
+.stats meter {
+    flex-grow: 1; 
+    min-width: 8rem;
+    height: 2rem;
+}
+
+.profile-icon {
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    -webkit-mask-image: url(./assets/cat.svg);
+    mask-image: url(./assets/cat.svg);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+
+.item-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.edit-btn {
+    background: rgb(3, 136, 3);
+}
+
+.edit-btn:hover {
+    background-color: rgb(3, 103, 3);
+}
+
+.delete-btn {
+    background: rgb(211, 47, 47);
+}
+
+.delete-btn:hover {
+    background-color: rgb(183, 28, 28);
 }

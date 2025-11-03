@@ -8,7 +8,7 @@
     content="width=device-width initial-scale=1"
   />
 
-  <title>Collecting Data</title>
+  <title>Managing Data</title>
 
   <link
     rel="preconnect"
@@ -23,61 +23,46 @@
     href="https://fonts.googleapis.com/css2?family=Jost:wght@100..900&display=swap"
     rel="stylesheet"
   >
-
-
   <link
     rel="stylesheet"
     href="style.css"
   />
 
+  <!--  DOMPurify cleans up HTML to prevent XSS attacks
+  https://www.jsdelivr.com/package/npm/dompurify  -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.3.0/dist/purify.min.js"></script>
 
 </head>
 
 <body>
   <header>
-    <h1>Collecting Data</h1>
-    <h4>POST content to an API Endpoint from an HTML Form to be stored in a Database.</h4>
-
-    <div class="intro">
-      <p>Previously we published data from a database by <a
-          href="https://github.com/ixd-system-design/API-Endpoints-for-Publishing-and-Searching"
-        >creating our own API</a>. Now, let's build functionality to allow users to submit and store data. We will add
-        two core elements:</p>
-      <ul>
-        <li>A <a
-            target="_blank"
-            href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST"
-          >POST</a> endpoint on the backend.</li>
-        <li>An <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form">HTML Form</a> on the
-          front-end.</li>
-      </ul>
-      <p> Form submissions are sent as JSON data in the body of a <a
-          target="_blank"
-          href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST"
-        >POST</a> request to an API endpoint, and saved to <a
-          href="https://www.mongodb.com/products/platform/atlas-database"
-        >MongoDB Atlas</a>.
-        API Endpoints are defined by <a href="https://expressjs.com">Express</a>, using <a
-          href="https://www.prisma.io/orm"
-        >Prisma</a> to communicate with the database.
-      </p>
-      <p>When successful, we will log the submission to the console, and also refresh the data list below. NOTE: this
-        demo implements the 'C' and 'R' of 'CRUD' (Create and Read) . We will deal with the 'U' and 'D' (Update and
-        Delete) elsewhere.</p>
-      </p>
-    </div>
+    <h1>Managing Data</h1>
+    <h4>CRUD: a full data lifecycle</h4>
   </header>
-
   <section id="status">
     <p id="readyStatus">✅ MongoDB is Ready</p>
     <p id="notReadyStatus">❌ MongoDB is not connected. Please check your connection string in <code>.env</code> file.
     </p>
   </section>
+  <button
+    id="createButton"
+    popovertarget="formPopover"
+  >Create New Cat</button>
 
-  <main>
-    <h2>🐈 <span>Share a Cat</span></h2>
+  <div
+    id="formPopover"
+    popover
+  >
+    <h2>🐈 Share a Cat</h2>
     <p>Share your kitty with the community</p>
     <form id="myForm">
+      <!-- Hidden field to store ID for updates -->
+      <input
+        type="hidden"
+        name="id"
+        id="id"
+      />
+
       <fieldset>
         <label for="name">Cat Name</label>
         <input
@@ -257,23 +242,57 @@
 
       <fieldset>
         <button class="save">Save</button>
-        <button class="reset">Reset</button>
+        <button
+          class="cancel"
+          type="button"
+          popovertarget="formPopover"
+          popovertargetaction="hide"
+        >Cancel</button>
       </fieldset>
     </form>
-
-
-  </main>
+  </div>
 
   <section id="content">
   </section>
 
-  <section>
+  <section id="intro">
+    <h3>About</h3>
+    <p>Previously we explored approaches to <a
+        href="https://github.com/ixd-system-design/API-Endpoints-for-Publishing-and-Searching"
+      >Publishing Data</a> and <a href="https://github.com/ixd-system-design/Collecting-Data">Collecting Data</a> by
+      means of API Endpoints (backend) and HTML forms (frontend). Having thus addressed the first two letters of
+      <a href="https://developer.mozilla.org/en-US/docs/Glossary/CRUD">CRUD</a> ("Create" and Read"), let's now
+      implement the last two letters as well ("Update" and "Delete"). This will
+      allow us to manage the full lifecycle of data records in our database.
+    </p>
+    <p>In order to operate on existing documents, we need to identify them by ID. The following two endpoints will
+      assume that we pass along the ID of the item to be updated or deleted:
+    <ol>
+      <li>An Express endpoint listens for HTTP <a
+          href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PUT"
+        >PUT</a> requests, with an ID parameter and a body payload (the updated data). Prisma
+        finds the corresponding document in the database and replaces it with the new data.</li>
+      <li>An Express endpoint listens for HTTP <a
+          href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/PUT"
+        >DELETE</a> requests, with an ID paramater passed along. Prisma finds the corresponding document and
+        removes it from the database.</li>
+    </ol>
+    </p>
+    <p>
+      To support these new operations on the frontend, we have adjusted the form behaviour. When editing an item, the
+      ID of the item is stored in a hidden input field. This allows us to track which item is being edited, and send
+      the correct ID to the backend when submitting updates. We also use the ID in the display template, so that the
+      Edit and Delete buttons can function correctly, and so that we can identify which item to remove when deleting.
+    </p>
+
     <h3>Learning Prompts</h3>
     <p>Can you add a connection string to the NodeJS environment (e.g. .env file) for your own MongoDB Atlas Cluster?
     </p>
     <p>Use MongoDB Compass to verify that your data collection form is working. </p>
-    <p>Looking ahead: in the future we will build a full CRUD implementation. Can you envision how we might add features
-      for Updating and deleting individual records?</p>
+    <p>Try out all CRUD operations: Create a new cat, Edit an existing cat by clicking the Edit button, and Delete a cat
+      you no longer need.</p>
+    <p>Explore the API endpoints in your browser: visit /data to see all cats in JSON format, or try /search?terms=Sofia
+      to search for specific cats.</p>
   </section>
 
   <footer>

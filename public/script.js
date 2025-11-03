@@ -2,147 +2,278 @@ let readyStatus = document.querySelector('#readyStatus')
 let notReadyStatus = document.querySelector('#notReadyStatus')
 let myForm = document.querySelector('#myForm')
 let contentArea = document.querySelector('#content')
+let formPopover = document.querySelector('#formPopover')
+let createButton = document.querySelector('#createButton')
+let formHeading = document.querySelector('#formPopover h2')
+
+// Get form data and process each type of input
+// Prepare the data as JSON with a proper set of types
+// e.g. Booleans, Numbers, Dates
+const getFormData = () => {
+    const formData = new FormData(myForm)
+    const json = Object.fromEntries(formData)
+
+    // Handle checkboxes, dates, and numbers
+    myForm.querySelectorAll('input').forEach(el => {
+        const value = json[el.name]
+        const isEmpty = !value || value.trim() === ''
+
+        // Represent checkboxes as a Boolean value (true/false)
+        if (el.type === 'checkbox') {
+            json[el.name] = el.checked
+        }
+        // Represent number and range inputs as actual numbers
+        else if (el.type === 'number' || el.type === 'range') {
+            json[el.name] = isEmpty ? null : Number(value)
+        }
+        // Represent all date inputs in ISO-8601 DateTime format
+        else if (el.type === 'date') {
+            json[el.name] = isEmpty ? null : new Date(value).toISOString()
+        }
+    })
+    return json
+}
+
 
 // listen for form submissions  
-myForm.addEventListener('submit', event => {
+myForm.addEventListener('submit', async event => {
     // prevent the page from reloading when the form is submitted.
-    event.preventDefault();
-    // if the user clicked "reset", reset the form
-    if (event.submitter.className == "reset") {
-        myForm.reset()
-    }
-    // otherwise assume we need to save the data.
-    else {
-
-        // if textarea.validity is false, alert the user and stop processing.
-        if (!myForm.description.checkValidity()) {
-            alert('Please provide a description of at least 20 characters.')
-            return
-        }
-
-        // Represent the FormData entries as a JSON object
-        // This gives a baseline representation with all values as strings
-        const formData = new FormData(myForm)
-        const json = Object.fromEntries(formData)
-
-        // Now let's improve the data by handling checkboxes dates, and numbers 
-        // more explicitly to prepare the data for storage  
-        event.target
-            .querySelectorAll('input')
-            .forEach(el => {
-                // Represent checkboxes as a Boolean value (true/false) 
-                // NOTE: By default, unchecked checkboxes are excluded 
-                if (el.type == 'checkbox') {
-                    json[el.name] = el.checked ? true : false
-                }
-                // Represent number and range inputs as actual numbers
-                else if (el.type == 'number' || el.type == 'range') {
-                    if (json[el.name] && json[el.name].trim() !== '') {
-                        json[el.name] = Number(json[el.name])
-                    }
-                    else {
-                        json[el.name] = null
-                    }
-                }
-                // Represent all date inputs in ISO-8601 DateTime format
-                // NOTE: this makes the date compatible for storage 
-                else if (el.type == 'date') {
-                    if (json[el.name] && json[el.name].trim() !== '') {
-                        json[el.name] = new Date(json[el.name]).toISOString()
-                    }
-                    else {
-                        json[el.name] = null
-                    }
-                }
-            })
-
-
-        console.log(json)
-        // pass the json along to be saved.
-        createItem(json)
-    }
+    event.preventDefault()
+    const data = getFormData()
+    await saveItem(data)
+    myForm.reset()
+    formPopover.hidePopover()
 })
 
 
-// Given some JSON data, send the data to the API
-// NOTE: "async" makes it possible to use "await" 
-// See also: https://mdn.io/Statements/async_function
-const createItem = async (myData) => {
-    // The save operation is nested in a Try/Catch statement
-    // See also: https://mdn.io/Statements/try...catch
+// Save item (Create or Update)
+const saveItem = async (data) => {
+    console.log('Saving:', data)
+
+    // Determine if this is an update or create
+    const endpoint = data.id ? `/data/${data.id}` : '/data'
+    const method = data.id ? "PUT" : "POST"
+
+    const options = {
+        method: method,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }
+
     try {
-        // Let's send the data to the /item endpoint
-        // we'll add the data to the body of the request. 
-        // https://mdn.io/Fetch_API/Using_Fetch#body
+        const response = await fetch(endpoint, options)
 
-        // We will use the POST method to signal that we want to create a new item
-        // Let's also add headers to tell the server we're sending JSON
-        // The data is sent in serialized form (via JSON.stringify) 
-
-        const response = await fetch('/data', {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(myData)
-        })
-        // Check if the response status is OK 
         if (!response.ok) {
             try {
-                console.error(await response.json())
+                const errorData = await response.json()
+                console.error('Error:', errorData)
+                alert(errorData.error || response.statusText)
             }
             catch (err) {
                 console.error(response.statusText)
+                alert('Failed to save: ' + response.statusText)
             }
-            throw new Error(response.statusText)
+            return
         }
-        // If all goes well we will recieve back the submitted data
-        // along with a new _id field added by MongoDB
+
         const result = await response.json()
-        alert('Data Sent to MongoDB via API. Details are in the console. To see all persisted data, visit the /data endpoint in another tab.');
-        // log the result 
-        console.log(result)
-        // refresh the data list
+        console.log('Saved:', result)
+
+
+        // Refresh the data list
         getData()
     }
     catch (err) {
-        // Log any errors
-        console.error(err)
+        console.error('Save error:', err)
+        alert('An error occurred while saving')
     }
-} // end of save function
+}
 
 
-// fetch items from API endpoint and populate the content div
-const getData = async () => {
-    const response = await fetch('/data')
-    if (response.ok) {
-        readyStatus.style.display = 'block'
-        const data = await response.json()
-        console.log(data)
-        if (data.length == 0) {
-            contentArea.innerHTML += '<p><i>No data found in the database.</i></p>'
-            return
+// Edit item - populate form with existing data
+const editItem = (data) => {
+    console.log('Editing:', data)
+
+    // Populate the form with data to be edited
+    Object.keys(data).forEach(field => {
+        const element = myForm.elements[field]
+        if (element) {
+            if (element.type === 'checkbox') {
+                element.checked = data[field]
+            } else if (element.type === 'date') {
+                // Convert ISO date to yyyy-mm-dd format
+                element.value = new Date(data[field]).toLocaleDateString('en-CA')
+            } else {
+                element.value = data[field]
+            }
+        }
+    })
+
+    // Update the heading to indicate edit mode
+    formHeading.textContent = '🐈 Edit Cat'
+
+    // Show the popover
+    formPopover.showPopover()
+}
+
+// Delete item
+const deleteItem = async (id) => {
+    if (!confirm('Are you sure you want to delete this cat?')) {
+        return
+    }
+
+    const endpoint = `/data/${id}`
+    const options = { method: "DELETE" }
+
+    try {
+        const response = await fetch(endpoint, options)
+
+        if (response.ok) {
+            const result = await response.json()
+            console.log('Deleted:', result)
+            // Refresh the data list
+            getData()
         }
         else {
-            contentArea.innerHTML = '<h2>🐈 Noteworthy Cats</h2>'
-            data.forEach(item => {
-                let div = document.createElement('div')
-                div.innerHTML = `<h3>${item.name}</h3>
-            <p>${item.microchip || '<i>No Microchip Found</i>'}</p>
-            <p>${item.description || '<i>No Description Found</i>'}</p>
-            `
-                contentArea.appendChild(div)
-            })
+            const errorData = await response.json()
+            alert(errorData.error || 'Failed to delete item')
         }
-
+    } catch (error) {
+        console.error('Delete error:', error)
+        alert('An error occurred while deleting')
     }
-    else {
+}
 
-        notReadyStatus.style.display = 'block'
 
-    }
+const calendarWidget = (date) => {
+    if (!date) return ''
+    const month = new Date(date).toLocaleString("en-CA", { month: 'short', timeZone: "UTC" })
+    const day = new Date(date).toLocaleString("en-CA", { day: '2-digit', timeZone: "UTC" })
+    const year = new Date(date).toLocaleString("en-CA", { year: 'numeric', timeZone: "UTC" })
+    return ` <div class="calendar">
+                <div class="born"><img src="./assets/birthday.svg" /></div>
+                <div class="month">${month}</div>
+                <div class="day">${day}</div> 
+                <div class="year">${year}</div>
+            </div>`
+
 
 }
 
+// Render a single item
+const renderItem = (item) => {
+    const div = document.createElement('div')
+    div.classList.add('item-card')
+    div.setAttribute('data-id', item.id)
+
+    const template = /*html*/`  
+    <div class="item-heading">
+        <h3> ${item.name} </h3>
+        <div class="microchip-info">
+            <img src="./assets/chip.svg" /> ${item.microchip || '<i>???</i>'} 
+        </div>  
+    </div>
+     <h4 class="breed" style="${item.breed ? '' : 'display:none;'}">  
+        ${item.breed }
+    </h4>
+    <div class="item-info"> 
+        <div class="profile-icon" style="
+            background: linear-gradient(135deg, 
+            ${item.primaryColor} 0%, 
+            ${item.primaryColor} 40%, 
+            ${item.secondaryColor} 60%, 
+            ${item.secondaryColor} 100%); 
+        "></div>
+    
+             ${calendarWidget(item.birthDate)}
+         <div class="stats">
+                <div class="stat">
+                    <span>Playfulness</span>
+                    <meter max="10" min="0" value="${item.playfulness || 0}"></meter> 
+                </div>
+                <div class="stat">
+                    <span>Appetite</span>
+                    <meter max="10" min="0" value="${item.appetite || 0}"></meter> 
+                </div>
+            </div> 
+        </div>
+        
+        <div class="item-info">
+
+         
+
+         
+            <section class="food" style="${item.food ? '' : 'display:none;'}">
+                <span>Prefers</span> <img src="./assets/${item.food}.svg" /> <span>${item.food} food</span>
+            </section>
+            
+            <section class="adoption">
+                <img src="./assets/${item.isAdopted? 'adopted' : 'paw'}.svg" />
+                ${item.isAdopted ? 'Adopted' : 'Waiting for a home'}
+            </section> 
+        </div>
+        
+            <p>${item.description || '<i>No Description Found</i>'}</p>
+        <div class="item-actions">
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+        </div>
+    `
+    div.innerHTML = DOMPurify.sanitize(template);
+
+    // Add event listeners to buttons
+    div.querySelector('.edit-btn').addEventListener('click', () => editItem(item))
+    div.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id))
+
+    return div
+}
+
+// fetch items from API endpoint and populate the content div
+const getData = async () => {
+    try {
+        const response = await fetch('/data')
+
+        if (response.ok) {
+            readyStatus.style.display = 'block'
+            notReadyStatus.style.display = 'none'
+
+            const data = await response.json()
+            console.log('Fetched data:', data)
+
+            if (data.length == 0) {
+                contentArea.innerHTML = '<h2>🐈 Noteworthy Cats</h2><p><i>No data found in the database.</i></p>'
+                return
+            }
+            else {
+                contentArea.innerHTML = '<h2>🐈 Noteworthy Cats</h2>'
+                data.forEach(item => {
+                    const itemDiv = renderItem(item)
+                    contentArea.appendChild(itemDiv)
+                })
+            }
+        }
+        else {
+            // If the request failed, show the "not ready" status
+            // to inform users that there may be a database connection issue
+            notReadyStatus.style.display = 'block'
+            readyStatus.style.display = 'none'
+            createButton.style.display = 'none'
+            contentArea.style.display = 'none'
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error)
+        notReadyStatus.style.display = 'block'
+    }
+}
+
+// Revert to the default form title on reset
+myForm.addEventListener('reset', () => formHeading.textContent = '🐈 Share a Cat')
+
+// Reset the form when the create button is clicked. 
+createButton.addEventListener('click', myForm.reset())
+
+// Load initial data
 getData()
