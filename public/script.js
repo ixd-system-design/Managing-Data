@@ -1,7 +1,7 @@
 let readyStatus = document.querySelector('#readyStatus')
 let notReadyStatus = document.querySelector('#notReadyStatus')
 let myForm = document.querySelector('#myForm')
-let contentArea = document.querySelector('#content')
+let contentArea = document.querySelector('#contentArea')
 let formPopover = document.querySelector('#formPopover')
 let createButton = document.querySelector('#createButton')
 let formHeading = document.querySelector('#formPopover h2')
@@ -176,47 +176,48 @@ const renderItem = (item) => {
             <img src="./assets/chip.svg" /> ${item.microchip || '<i>???</i>'} 
         </div>  
     </div>
-     <h4 class="breed" style="${item.breed ? '' : 'display:none;'}">  
-        ${item.breed }
-    </h4>
     <div class="item-info"> 
-        <div class="profile-icon" style="
+        <div class="item-icon" style="
             background: linear-gradient(135deg, 
             ${item.primaryColor} 0%, 
             ${item.primaryColor} 40%, 
             ${item.secondaryColor} 60%, 
             ${item.secondaryColor} 100%); 
-        "></div>
-    
-             ${calendarWidget(item.birthDate)}
-         <div class="stats">
-                <div class="stat">
-                    <span>Playfulness</span>
-                    <meter max="10" min="0" value="${item.playfulness || 0}"></meter> 
-                </div>
-                <div class="stat">
-                    <span>Appetite</span>
-                    <meter max="10" min="0" value="${item.appetite || 0}"></meter> 
-                </div>
-            </div> 
-        </div>
-        
-        <div class="item-info">
-
-         
-
-         
-            <section class="food" style="${item.food ? '' : 'display:none;'}">
-                <span>Prefers</span> <img src="./assets/${item.food}.svg" /> <span>${item.food} food</span>
-            </section>
+        ">
+        </div> 
+        <div class="stats">
+            <div class="stat">
+                <span>Playfulness</span>
+                <meter max="10" min="0" value="${item.playfulness || 0}"></meter> 
+            </div>
+            <div class="stat">
+                <span>Appetite</span>
+                <meter max="10" min="0" value="${item.appetite || 0}"></meter> 
+            </div>
+        </div> 
             
-            <section class="adoption">
-                <img src="./assets/${item.isAdopted? 'adopted' : 'paw'}.svg" />
-                ${item.isAdopted ? 'Adopted' : 'Waiting for a home'}
-            </section> 
-        </div>
+         ${calendarWidget(item.birthDate)}
+    </div>
         
-            <p>${item.description || '<i>No Description Found</i>'}</p>
+    <div class="item-info">  
+        <section class="breed" style="${item.breed ? '' : 'display:none;'}">  
+            <img src="./assets/ribbon.svg" />  ${item.breed }
+        </section>
+        <section class="food" style="${item.food ? '' : 'display:none;'}">
+             <img src="./assets/${item.food}.svg" /> <span>${item.food} food</span>
+        </section> 
+        <section class="adoption">
+            <img src="./assets/${item.isAdopted? 'adopted' : 'paw'}.svg" />
+            ${item.isAdopted ? 'Adopted' : 'Available'}
+        </section> 
+    </div>
+
+    <section class="description" style="${item.description ? '' : 'display:none;'}">  
+        <p>${item.description  }</p>
+    </section>
+
+        
+           
         <div class="item-actions">
             <button class="edit-btn">Edit</button>
             <button class="delete-btn">Delete</button>
@@ -244,11 +245,11 @@ const getData = async () => {
             console.log('Fetched data:', data)
 
             if (data.length == 0) {
-                contentArea.innerHTML = '<h2>🐈 Noteworthy Cats</h2><p><i>No data found in the database.</i></p>'
+                contentArea.innerHTML = '<p><i>No data found in the database.</i></p>'
                 return
             }
             else {
-                contentArea.innerHTML = '<h2>🐈 Noteworthy Cats</h2>'
+                contentArea.innerHTML = ''
                 data.forEach(item => {
                     const itemDiv = renderItem(item)
                     contentArea.appendChild(itemDiv)
