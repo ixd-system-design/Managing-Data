@@ -14,20 +14,9 @@ body {
     background-color: rgb(238, 227, 144)
 }
 
-s
-h2 {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: auto;
-}
 
 h2 img {
     width: 2rem;
-}
-
-p {
-    /* font-size: 1.25rem; */
 }
 
 nav {
@@ -101,7 +90,7 @@ button.cancel:hover {
 }
 
 
-#contentArea {   
+#contentArea {
     display: grid;
     grid-template-columns: auto auto;
     gap: 1rem;
@@ -258,7 +247,7 @@ textarea:user-invalid+.validation {
 }
 
 /*  card styles */
-.item-card { 
+.item-card {
     border-radius: 1rem;
     padding: 1.5rem;
     margin: 1rem 0;
@@ -274,7 +263,7 @@ textarea:user-invalid+.validation {
 .item-card h3 {
     font-size: 2rem;
     margin: 0 0 1rem 0;
-    color: #333; 
+    color: #333;
 }
 
 .item-heading {
@@ -294,6 +283,7 @@ textarea:user-invalid+.validation {
     color: #666;
     margin: 0.75rem 0 0 2rem;
 }
+
 .item-info {
     width: 100%;
     display: flex;
@@ -309,21 +299,22 @@ textarea:user-invalid+.validation {
 
 section.breed,
 section.adoption,
-section.food{
+section.food {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;;
+    padding: 0.5rem 1rem;
+    ;
     background: white;
     border-radius: 1rem;
     border: 1px solid #ccc;
 }
 
 section.food img,
-section.adoption img{
+section.adoption img {
     width: 1.5rem;
 }
- 
+
 
 
 /* styling for the calendar widget*/
@@ -333,8 +324,8 @@ section.adoption img{
     width: 4rem;
     text-align: center;
     margin: 1rem 0 1rem auto;
-    background: #3b3b3b66; 
-    color: #fff; 
+    background: #3b3b3b66;
+    color: #fff;
     border-radius: 1rem;
 }
 
@@ -368,7 +359,7 @@ section.adoption img{
     font-size: 2rem;
     font-weight: 700;
 }
- 
+
 
 .description {
     max-width: 32rem;
@@ -397,13 +388,13 @@ meter::-webkit-meter-suboptimum-value {
 meter::-webkit-meter-even-less-good-value {
     background: #e3c784;
 }
- 
- 
+
+
 
 .stats .stat {
     display: flex;
     align-items: center;
-    gap: 0.5rem; 
+    gap: 0.5rem;
     font-weight: 300;
     padding: 0 3rem 0 1rem;
 
@@ -415,7 +406,7 @@ meter::-webkit-meter-even-less-good-value {
 }
 
 .stats meter {
-    flex-grow: 1; 
+    flex-grow: 1;
     min-width: 8rem;
     height: 2rem;
 }
