@@ -10,6 +10,8 @@ let formHeading = document.querySelector('#formPopover h2')
 // Prepare the data as JSON with a proper set of types
 // e.g. Booleans, Numbers, Dates
 const getFormData = () => {
+    // FormData gives a baseline representation of the form
+    // with all fields represented as strings
     const formData = new FormData(myForm)
     const json = Object.fromEntries(formData)
 
