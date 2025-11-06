@@ -12,6 +12,12 @@ const model = 'cats'
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
+// Connect to the database
+prisma.$connect().then(() => {
+    console.log('Prisma connected to MongoDB')
+}).catch(err => {
+    console.error('Failed to connect to MongoDB:', err)
+})
 
 // ----- CREATE (POST) -----
 // Create a new record for the configured model
