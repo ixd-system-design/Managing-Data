@@ -104,8 +104,8 @@ const editItem = (data) => {
             if (element.type === 'checkbox') {
                 element.checked = data[field]
             } else if (element.type === 'date') {
-                // Convert ISO date to yyyy-mm-dd format
-                element.value = new Date(data[field]).toLocaleDateString('en-CA')
+                // Extract yyyy-mm-dd from ISO date string (avoids timezone issues)
+                element.value = data[field] ? data[field].substring(0, 10) : ''
             } else {
                 element.value = data[field]
             }
@@ -160,7 +160,6 @@ const calendarWidget = (date) => {
                 <div class="year">${year}</div>
             </div>`
 
-
 }
 
 // Render a single item
@@ -201,19 +200,19 @@ const renderItem = (item) => {
         
     <div class="item-info">  
         <section class="breed" style="${item.breed ? '' : 'display:none;'}">  
-            <img src="./assets/ribbon.svg" />  ${item.breed }
+            <img src="./assets/ribbon.svg" />  ${item.breed}
         </section>
         <section class="food" style="${item.food ? '' : 'display:none;'}">
              <img src="./assets/${item.food}.svg" /> <span>${item.food} food</span>
         </section> 
         <section class="adoption">
-            <img src="./assets/${item.isAdopted? 'adopted' : 'paw'}.svg" />
+            <img src="./assets/${item.isAdopted ? 'adopted' : 'paw'}.svg" />
             ${item.isAdopted ? 'Adopted' : 'Available'}
         </section> 
     </div>
 
     <section class="description" style="${item.description ? '' : 'display:none;'}">  
-        <p>${item.description  }</p>
+        <p>${item.description}</p>
     </section>
 
         
